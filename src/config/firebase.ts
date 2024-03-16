@@ -1,13 +1,15 @@
 import * as firebase from "firebase/app";
 import { getStorage } from "firebase/storage";
+import dotenv from "dotenv";
+dotenv.config();
 
 const firebaseConfig = {
-    apiKey: "AIzaSyDgFDBtWJdtG9C1ibHt5O6rng-25CUz0f0",
-    authDomain: "setmispace-f344a.firebaseapp.com",
-    projectId: "setmispace-f344a",
-    storageBucket: "setmispace-f344a.appspot.com",
-    messagingSenderId: "212674361963",
-    appId: "1:212674361963:web:0a0040946294e766744f2e",
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_CENTER_ID,
+    appId: process.env.FIREBASE_APP_ID,
 };
 
 firebase.initializeApp(firebaseConfig);
