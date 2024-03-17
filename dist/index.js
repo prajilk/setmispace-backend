@@ -15,22 +15,19 @@ const routes_3 = require("./routes");
 const routes_4 = require("./routes");
 //Connect to database
 require("./config/db");
-const verifyToken_1 = require("./auth/verifyToken");
 const app = (0, express_1.default)();
 app.use(express_1.default.json({ limit: "200mb" }));
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
-    origin: [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "https://setmispace.vercel.app/",
-        "https://admin-setmispace.vercel.app/",
-    ],
+    origin: "https://setmispace.vercel.app",
+    // origin: [
+    //     "http://localhost:3000",
+    //     "http://localhost:5173",
+    //     "https://setmispace.vercel.app",
+    //     "https://admin-setmispace.vercel.app",
+    // ],
     credentials: true,
-    methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
-    allowedHeaders: ["Content-Type"],
 }));
-app.use(verifyToken_1.verifyToken);
 app.use("/api/admin", routes_1.adminRouter);
 app.use("/api/business", routes_2.businessRouter);
 app.use("/api/hot-selling", routes_3.hotSellingRouter);

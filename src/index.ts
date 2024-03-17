@@ -12,7 +12,6 @@ import { contactRouter } from "./routes";
 
 //Connect to database
 import "./config/db";
-import { verifyToken } from "./auth/verifyToken";
 
 const app = express();
 
@@ -20,19 +19,16 @@ app.use(express.json({ limit: "200mb" }));
 app.use(cookieParser());
 app.use(
     cors({
-        origin: [
-            "http://localhost:3000",
-            "http://localhost:5173",
-            "https://setmispace.vercel.app/",
-            "https://admin-setmispace.vercel.app/",
-        ],
+        origin: "https://setmispace.vercel.app",
+        // origin: [
+        //     "http://localhost:3000",
+        //     "http://localhost:5173",
+        //     "https://setmispace.vercel.app",
+        //     "https://admin-setmispace.vercel.app",
+        // ],
         credentials: true,
-        methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
-        allowedHeaders: ["Content-Type"],
     })
 );
-
-app.use(verifyToken);
 
 app.use("/api/admin", adminRouter);
 app.use("/api/business", businessRouter);
