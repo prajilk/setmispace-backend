@@ -41,14 +41,14 @@ const verifyToken = (req, res, next) => {
             });
         }
         catch (err) {
-            // Refreh the ACCESS Token using REFREH Token
+            // Refresh the ACCESS Token using REFRESH Token
             return (0, refreshToken_1.refreshToken)(req, res, next, exports.verifyToken);
         }
     }
     else {
         return res
             .status(401)
-            .send({ data: "Cookie is not recieved", error: true });
+            .send({ data: "Cookie is not received", error: true });
     }
 };
 exports.verifyToken = verifyToken;

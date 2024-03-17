@@ -43,12 +43,12 @@ export const verifyToken = (
                     else res.status(500).json(err);
                 });
         } catch (err) {
-            // Refreh the ACCESS Token using REFREH Token
+            // Refresh the ACCESS Token using REFRESH Token
             return refreshToken(req, res, next, verifyToken);
         }
     } else {
         return res
             .status(401)
-            .send({ data: "Cookie is not recieved", error: true });
+            .send({ data: "Cookie is not received", error: true });
     }
 };
