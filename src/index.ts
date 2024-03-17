@@ -27,6 +27,8 @@ app.use(
             "https://admin-setmispace.vercel.app/",
         ],
         credentials: true,
+        methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
+        allowedHeaders: ["Content-Type"],
     })
 );
 

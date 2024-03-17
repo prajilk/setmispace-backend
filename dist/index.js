@@ -27,6 +27,8 @@ app.use((0, cors_1.default)({
         "https://admin-setmispace.vercel.app/",
     ],
     credentials: true,
+    methods: "GET,HEAD,OPTIONS,PUT,PATCH,POST,DELETE",
+    allowedHeaders: ["Content-Type"],
 }));
 app.use(verifyToken_1.verifyToken);
 app.use("/api/admin", routes_1.adminRouter);
