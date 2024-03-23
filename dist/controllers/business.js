@@ -9,11 +9,74 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleGetAllCategories = exports.handleCreateBusiness = exports.handleGetAllFeatures = exports.handleGetBusiness = exports.handleGetLatestBusinesses = exports.handleGetAllBusinesses = void 0;
+exports.handleDeleteBusiness = exports.handleGetAllCategories = exports.handleCreateBusiness = exports.handleGetAllFeatures = exports.handleGetBusiness = exports.handleGetLatestBusinesses = exports.handleGetAllBusinesses = void 0;
 const models_1 = require("../models");
 const features_1 = require("../models/features");
 const upload_1 = require("../lib/firebase/upload");
+const delete_1 = require("../lib/firebase/delete");
 const utils_1 = require("../lib/utils");
+function handleCreateBusiness(req, res) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const data = req.body;
+            if (!data) {
+                return res.status(400).send("Invalid data format.");
+            }
+            const tags = data.tags.replace(/ /g, "").split(",");
+            const features = (_a = data.features) === null || _a === void 0 ? void 0 : _a.split(",");
+            const businessSlug = data.business.toLowerCase().replace(/ /g, "-");
+            // Upload Image to Firebase
+            const thumbnailUrl = yield (0, upload_1.upload)(data.images.thumbnail, `businesses/${businessSlug}/` + "thumbnail.jpg");
+            if (!thumbnailUrl) {
+                return res.status(500).send("Unable to upload image!");
+            }
+            let logoUrl, featuredUrl, gallery;
+            if (data.images.logo) {
+                logoUrl = yield (0, upload_1.upload)(data.images.logo, `businesses/${businessSlug}/logo.png`);
+            }
+            if (data.images.featured) {
+                featuredUrl = yield (0, upload_1.upload)(data.images.featured, `businesses/${businessSlug}/featured.jpg`);
+            }
+            if (data.images.gallery.length > 0) {
+                gallery = yield Promise.all(data.images.gallery.map((image, index) => __awaiter(this, void 0, void 0, function* () {
+                    return yield (0, upload_1.upload)(image, `businesses/${businessSlug}/gallery/gallery-img${index + 1}.jpg`);
+                })));
+            }
+            let listingData = {
+                business: data.business,
+                description: data.description,
+                address: data.address,
+                plan: data.plan,
+                category: data.category,
+                thumbnail: thumbnailUrl,
+                tags,
+            };
+            if (data.plan === "paid") {
+                Object.assign(listingData, {
+                    phone: data.phone,
+                    mail: data.mail,
+                    website: data.website,
+                    mapLink: data.mapLink,
+                    socials: (0, utils_1.makeSocials)(data),
+                    logo: logoUrl,
+                    featured: featuredUrl,
+                    gallery,
+                    features,
+                });
+            }
+            yield models_1.Business.create(listingData);
+            return res.status(201).json({ status: "ok" });
+        }
+        catch (error) {
+            res.status(500).json({
+                message: "Something went wrong",
+                error: error.message,
+            });
+        }
+    });
+}
+exports.handleCreateBusiness = handleCreateBusiness;
 function handleGetAllBusinesses(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -86,66 +149,40 @@ function handleGetAllCategories(req, res) {
     });
 }
 exports.handleGetAllCategories = handleGetAllCategories;
-function handleCreateBusiness(req, res) {
-    var _a;
+function handleDeleteBusiness(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const data = req.body;
-            if (!data) {
-                return res.status(400).send("Invalid data format.");
+            const businessId = req.params.id;
+            if (!businessId) {
+                return res
+                    .status(404)
+                    .json({ message: "Invalid Business ID", business: null });
             }
-            const tags = data.tags.replace(/ /g, "").split(",");
-            const features = (_a = data.features) === null || _a === void 0 ? void 0 : _a.split(",");
-            const businessSlug = data.business.toLowerCase().replace(/ /g, "-");
-            // Upload Image to Firebase
-            const thumbnailUrl = yield (0, upload_1.upload)(data.images.thumbnail, `businesses/${businessSlug}/` + "thumbnail.jpg");
-            if (!thumbnailUrl) {
-                return res.status(500).send("Unable to upload image!");
+            const business = yield models_1.Business.findById(businessId);
+            if (!business) {
+                return res
+                    .status(404)
+                    .json({ message: "Invalid Business ID", business: null });
             }
-            let logoUrl, featuredUrl, gallery;
-            if (data.images.logo) {
-                logoUrl = yield (0, upload_1.upload)(data.images.logo, `businesses/${businessSlug}/logo.png`);
+            const businessSlug = business.business.toLowerCase().replace(/ /g, "-");
+            const isImagesDelete = yield (0, delete_1.deleteFilesInFolder)("businesses/" + businessSlug);
+            if (isImagesDelete) {
+                const deleteBusiness = yield models_1.Business.findByIdAndDelete(businessId);
+                if (!deleteBusiness) {
+                    return res
+                        .status(404)
+                        .json({ message: "Invalid Business ID", business: null });
+                }
+                return res.status(200).json({ success: true, message: "deleted" });
             }
-            if (data.images.featured) {
-                featuredUrl = yield (0, upload_1.upload)(data.images.featured, `businesses/${businessSlug}/featured.jpg`);
+            else {
+                throw new Error();
             }
-            if (data.images.gallery.length > 0) {
-                gallery = yield Promise.all(data.images.gallery.map((image, index) => __awaiter(this, void 0, void 0, function* () {
-                    return yield (0, upload_1.upload)(image, `businesses/${businessSlug}/gallery/gallery-img${index + 1}.jpg`);
-                })));
-            }
-            let listingData = {
-                business: data.business,
-                description: data.description,
-                address: data.address,
-                plan: data.plan,
-                category: data.category,
-                thumbnail: thumbnailUrl,
-                tags,
-            };
-            if (data.plan === "paid") {
-                Object.assign(listingData, {
-                    phone: data.phone,
-                    mail: data.mail,
-                    website: data.website,
-                    mapLink: data.mapLink,
-                    socials: (0, utils_1.makeSocials)(data),
-                    logo: logoUrl,
-                    featured: featuredUrl,
-                    gallery,
-                    features,
-                });
-            }
-            yield models_1.Business.create(listingData);
-            return res.status(201).json({ status: "ok" });
         }
         catch (error) {
-            res.status(500).json({
-                message: "Something went wrong",
-                error: error.message,
-            });
+            return res.status(500).json({ error, success: false });
         }
     });
 }
-exports.handleCreateBusiness = handleCreateBusiness;
+exports.handleDeleteBusiness = handleDeleteBusiness;
 //# sourceMappingURL=business.js.map

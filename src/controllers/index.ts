@@ -5,6 +5,7 @@ import {
     handleCreateBusiness,
     handleGetBusiness,
     handleGetAllCategories,
+    handleDeleteBusiness,
 } from "./business";
 import { handleGetHotSellingBusinesses } from "./hot-selling";
 import { handleNewContact } from "./contact";
@@ -17,6 +18,7 @@ const businessController = {
     handleGetAllFeatures,
     handleCreateBusiness,
     handleGetAllCategories,
+    handleDeleteBusiness,
 };
 const hotSellingController = {
     handleGetHotSellingBusinesses,

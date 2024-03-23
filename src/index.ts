@@ -20,15 +20,11 @@ app.use(cookieParser());
 app.use(
     cors({
         origin: [
+            // "http://localhost:3000",
+            // "http://localhost:5173",
             "https://setmispace.vercel.app",
             "https://admin-setmispace.vercel.app",
         ],
-        // origin: [
-        //     "http://localhost:3000",
-        //     "http://localhost:5173",
-        //     "https://setmispace.vercel.app",
-        //     "https://admin-setmispace.vercel.app",
-        // ],
         credentials: true,
     })
 );

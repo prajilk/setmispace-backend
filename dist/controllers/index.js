@@ -12,6 +12,7 @@ const businessController = {
     handleGetAllFeatures: business_1.handleGetAllFeatures,
     handleCreateBusiness: business_1.handleCreateBusiness,
     handleGetAllCategories: business_1.handleGetAllCategories,
+    handleDeleteBusiness: business_1.handleDeleteBusiness,
 };
 exports.businessController = businessController;
 const hotSellingController = {

@@ -2,69 +2,9 @@ import { Request, Response } from "express";
 import { Business, Category } from "../models";
 import { Feature } from "../models/features";
 import { upload } from "../lib/firebase/upload";
+import { deleteFilesInFolder } from "../lib/firebase/delete";
 import { Images, Listing } from "../lib/types/business";
 import { makeSocials } from "../lib/utils";
-
-async function handleGetAllBusinesses(req: Request, res: Response) {
-    try {
-        const businesses = await Business.find();
-        return res.status(200).json({ businesses });
-    } catch (error) {
-        return res.status(500).json({ error });
-    }
-}
-
-async function handleGetLatestBusinesses(req: Request, res: Response) {
-    try {
-        const businesses = await Business.find();
-        const latestBusinesses = businesses?.sort(
-            (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
-        );
-        return res.status(200).json({ businesses: latestBusinesses });
-    } catch (error) {
-        return res.status(500).json({ error });
-    }
-}
-
-async function handleGetBusiness(req: Request, res: Response) {
-    try {
-        const businessId = req.params.id;
-        if (!businessId) {
-            return res
-                .status(404)
-                .json({ message: "Invalid Business ID", business: null });
-        }
-
-        const business = await Business.findById(businessId);
-        if (!business) {
-            return res
-                .status(404)
-                .json({ message: "Invalid Business ID", business: null });
-        }
-
-        return res.status(200).json({ business });
-    } catch (error) {
-        return res.status(500).json({ error, business: null });
-    }
-}
-
-async function handleGetAllFeatures(req: Request, res: Response) {
-    try {
-        const features = await Feature.find();
-        return res.status(200).json({ features });
-    } catch (error) {
-        return res.status(500).json({ error });
-    }
-}
-
-async function handleGetAllCategories(req: Request, res: Response) {
-    try {
-        const categories = await Category.find();
-        return res.status(200).json({ categories });
-    } catch (error) {
-        return res.status(500).json({ error });
-    }
-}
 
 async function handleCreateBusiness(req: Request, res: Response) {
     try {
@@ -152,6 +92,107 @@ async function handleCreateBusiness(req: Request, res: Response) {
     }
 }
 
+async function handleGetAllBusinesses(req: Request, res: Response) {
+    try {
+        const businesses = await Business.find();
+        return res.status(200).json({ businesses });
+    } catch (error) {
+        return res.status(500).json({ error });
+    }
+}
+
+async function handleGetLatestBusinesses(req: Request, res: Response) {
+    try {
+        const businesses = await Business.find();
+        const latestBusinesses = businesses?.sort(
+            (a, b) => +new Date(b.createdAt) - +new Date(a.createdAt)
+        );
+        return res.status(200).json({ businesses: latestBusinesses });
+    } catch (error) {
+        return res.status(500).json({ error });
+    }
+}
+
+async function handleGetBusiness(req: Request, res: Response) {
+    try {
+        const businessId = req.params.id;
+        if (!businessId) {
+            return res
+                .status(404)
+                .json({ message: "Invalid Business ID", business: null });
+        }
+
+        const business = await Business.findById(businessId);
+        if (!business) {
+            return res
+                .status(404)
+                .json({ message: "Invalid Business ID", business: null });
+        }
+
+        return res.status(200).json({ business });
+    } catch (error) {
+        return res.status(500).json({ error, business: null });
+    }
+}
+
+async function handleGetAllFeatures(req: Request, res: Response) {
+    try {
+        const features = await Feature.find();
+        return res.status(200).json({ features });
+    } catch (error) {
+        return res.status(500).json({ error });
+    }
+}
+
+async function handleGetAllCategories(req: Request, res: Response) {
+    try {
+        const categories = await Category.find();
+        return res.status(200).json({ categories });
+    } catch (error) {
+        return res.status(500).json({ error });
+    }
+}
+
+async function handleDeleteBusiness(req: Request, res: Response) {
+    try {
+        const businessId = req.params.id;
+        if (!businessId) {
+            return res
+                .status(404)
+                .json({ message: "Invalid Business ID", business: null });
+        }
+
+        const business = await Business.findById(businessId);
+        if (!business) {
+            return res
+                .status(404)
+                .json({ message: "Invalid Business ID", business: null });
+        }
+
+        const businessSlug = business.business.toLowerCase().replace(/ /g, "-");
+
+        const isImagesDelete = await deleteFilesInFolder(
+            "businesses/" + businessSlug
+        );
+
+        if (isImagesDelete) {
+            const deleteBusiness = await Business.findByIdAndDelete(businessId);
+
+            if (!deleteBusiness) {
+                return res
+                    .status(404)
+                    .json({ message: "Invalid Business ID", business: null });
+            }
+
+            return res.status(200).json({ success: true, message: "deleted" });
+        } else {
+            throw new Error();
+        }
+    } catch (error) {
+        return res.status(500).json({ error, success: false });
+    }
+}
+
 export {
     handleGetAllBusinesses,
     handleGetLatestBusinesses,
@@ -159,4 +200,5 @@ export {
     handleGetAllFeatures,
     handleCreateBusiness,
     handleGetAllCategories,
+    handleDeleteBusiness,
 };

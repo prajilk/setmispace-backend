@@ -10,4 +10,6 @@ router.get("/:id", businessController.handleGetBusiness);
 
 router.post("/new", businessController.handleCreateBusiness);
 
+router.delete("/:id", businessController.handleDeleteBusiness);
+
 export = router;

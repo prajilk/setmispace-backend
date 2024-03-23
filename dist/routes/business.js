@@ -11,5 +11,6 @@ router.get("/features", controllers_1.businessController.handleGetAllFeatures);
 router.get("/categories", controllers_1.businessController.handleGetAllCategories);
 router.get("/:id", controllers_1.businessController.handleGetBusiness);
 router.post("/new", controllers_1.businessController.handleCreateBusiness);
+router.delete("/:id", controllers_1.businessController.handleDeleteBusiness);
 module.exports = router;
 //# sourceMappingURL=business.js.map
